@@ -2,7 +2,7 @@
 let products = [];
 
 try {
-    const res = await fetch("http://localhost:4321/api/products"); // o tu URL base
+    const res = await fetch("http://localhost:4321/api/products");
     if (res.ok) {
         products = await res.json();
     } else {
@@ -18,40 +18,39 @@ try {
         class="grid grid-cols-1 gap-6 lg:gap-y-24 md:grid-cols-2 lg:grid-cols-3 py-12"
     >
         {
-            products.length === 0 ? (
-                <p class="text-center text-gray-500">
-                    No hay productos disponibles
-                </p>
-            ) : (
+            products.length > 0 ? (
                 products.map((product) => (
-                    <figure class="relative">
-                        <a
-                            href={product.url || "#_"}
-                            aria-hidden="true"
-                            class="absolute inset-0"
-                        />
+                    <figure class="relative bg-white rounded-3xl shadow p-4 transition hover:scale-[1.02] duration-300">
                         <img
-                            width="800"
-                            height="800"
-                            alt={product.title}
                             src={product.image}
-                            class="w-full rounded-3xl shadow aspect-[12/9] object-cover object-center"
+                            alt={product.name}
+                            class="w-full rounded-2xl aspect-square object-cover object-center"
                         />
-                        <div class="mt-2 flex justify-between px-6">
+                        <div class="mt-4 flex justify-between items-start">
                             <div>
-                                <p class="mt-1 text-sm font-medium text-base-900">
-                                    {product.subtitle}
+                                <p class="text-sm text-gray-600">
+                                    {product.description}
                                 </p>
-                                <h3 class="text-xs text-base-500">
-                                    {product.title}
+                                <h3 class="text-base font-semibold">
+                                    {product.name}
                                 </h3>
+                                <p class="text-orange-600 font-bold mt-1">
+                                    ${product.price}
+                                </p>
                             </div>
-                            <p class="text-base text-orange-600">
-                                {product.price}
-                            </p>
                         </div>
+                        <button
+                            class="mt-4 w-full bg-orange-500 text-white py-2 rounded-full hover:bg-orange-600 duration-300"
+                            onclick={`addToCart({ id: ${product.id}, name: '${product.name}', price: ${product.price} })`}
+                        >
+                            Añadir al carrito
+                        </button>
                     </figure>
                 ))
+            ) : (
+                <p class="text-center text-base-600 w-full">
+                    No hay productos disponibles
+                </p>
             )
         }
     </div>
