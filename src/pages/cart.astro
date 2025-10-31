@@ -1,0 +1,113 @@
+---
+
+---
+
+<section class="max-w-3xl mx-auto py-16 px-4">
+    <h1 class="text-3xl font-bold mb-6 flex items-center gap-2">
+        🛒 Tu carrito
+    </h1>
+
+    <div id="cart-items" class="space-y-4"></div>
+
+    <div id="cart-summary" class="mt-6 text-right hidden">
+        <p class="text-lg font-semibold">
+            Total: <span id="cart-total" class="text-orange-600">$0</span>
+        </p>
+        <button
+            class="mt-3 bg-orange-500 text-white py-2 px-6 rounded-full hover:bg-orange-600 duration-300"
+            id="clear-cart"
+        >
+            Vaciar carrito
+        </button>
+    </div>
+
+    <p id="empty-msg" class="text-gray-500 text-center mt-8">
+        Tu carrito está vacío 😢
+    </p>
+
+    <div class="mt-8 text-center">
+        <a
+            href="/"
+            class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-full"
+        >
+            ← Seguir comprando
+        </a>
+    </div>
+</section>
+
+<script>
+    if (typeof window !== "undefined") {
+        const cartItemsContainer = document.getElementById("cart-items");
+        const cartTotal = document.getElementById("cart-total");
+        const cartSummary = document.getElementById("cart-summary");
+        const emptyMsg = document.getElementById("empty-msg");
+        const clearBtn = document.getElementById("clear-cart");
+
+        function loadCart() {
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            cartItemsContainer.innerHTML = "";
+
+            if (cart.length === 0) {
+                emptyMsg.style.display = "block";
+                cartSummary.classList.add("hidden");
+                return;
+            }
+
+            emptyMsg.style.display = "none";
+            cartSummary.classList.remove("hidden");
+
+            let total = 0;
+
+            cart.forEach((item) => {
+                const div = document.createElement("div");
+                div.className =
+                    "flex justify-between items-center border-b pb-2 border-gray-200";
+                div.innerHTML = `
+          <div>
+            <h3 class="font-semibold">${item.name}</h3>
+            <p class="text-sm text-gray-500">$${item.price} x ${item.quantity}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="bg-gray-200 px-2 rounded" onclick="updateQuantity(${item.id}, -1)">-</button>
+            <span>${item.quantity}</span>
+            <button class="bg-gray-200 px-2 rounded" onclick="updateQuantity(${item.id}, 1)">+</button>
+            <button class="text-red-500 ml-3" onclick="removeItem(${item.id})">✖</button>
+          </div>
+        `;
+                cartItemsContainer.appendChild(div);
+
+                total += item.price * item.quantity;
+            });
+
+            cartTotal.textContent = `$${total.toFixed(2)}`;
+        }
+
+        window.updateQuantity = function (id, change) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            const product = cart.find((p) => p.id === id);
+            if (product) {
+                product.quantity += change;
+                if (product.quantity <= 0) {
+                    cart = cart.filter((p) => p.id !== id);
+                }
+            }
+            localStorage.setItem("cart", JSON.stringify(cart));
+            loadCart();
+        };
+
+        window.removeItem = function (id) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            cart = cart.filter((p) => p.id !== id);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            loadCart();
+        };
+
+        clearBtn.addEventListener("click", () => {
+            localStorage.removeItem("cart");
+            loadCart();
+        });
+
+        loadCart();
+    }
+</script>
