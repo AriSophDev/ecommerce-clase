@@ -1,55 +1,16 @@
 ---
-import { Image } from "astro:assets";
-import p1 from "@/images/1.jpeg";
-import p2 from "@/images/2.jpg";
-import p3 from "@/images/3.jpg";
-import p4 from "@/images/4.jpg";
-import p5 from "@/images/5.jpg";
-import p6 from "@/images/6.jpg";
-const products = [
-    {
-        url: "#_",
-        title: "Camiseta “Sweet Vintage”",
-        subtitle: "Suavidad y nostalgia en una prenda que combina con todo.",
-        price: "$59",
-        image: p1,
-    },
-    {
-        url: "#_",
-        title: "Vestido “Checkmate”",
-        subtitle: "Cuadros clásicos con actitud moderna. Perfecto para días casuales con estilo.",
-        price: "$79",
-        image: p2,
-    },
-    {
-        url: "#_",
-        title: "Vestido “Crimson Aura”",
-        subtitle: "Un toque elegante y rebelde para destacar sin esfuerzo.",
-        price: "$110",
-        image: p3,
-    },
-    {
-        url: "#_",
-        title: "Shorts “Rebel Heart”",
-        subtitle: "Denim, cadenas y seguridad en cada paso. Ideal para looks urbanos.",
-        price: "$129",
-        image: p4,
-    },
-    {
-        url: "#_",
-        title: "Vestido “Velvet Eclipse”",
-        subtitle: "Oscuro, sofisticado y con transparencias que dicen más de lo que muestran.",
-        price: "$149",
-        image: p5,
-    },
-    {
-        url: "#_",
-        title: "Vestido “Midnight Muse”",
-        subtitle: "Una silueta misteriosa que resalta tu lado más encantador.",
-        price: "$189",
-        image: p6,
-    },
-];
+let products = [];
+
+try {
+    const res = await fetch("http://localhost:4321/api/products"); // o tu URL base
+    if (res.ok) {
+        products = await res.json();
+    } else {
+        console.error("Error al cargar productos:", res.statusText);
+    }
+} catch (err) {
+    console.error("No se pudo conectar con la API:", err);
+}
 ---
 
 <section>
@@ -57,33 +18,41 @@ const products = [
         class="grid grid-cols-1 gap-6 lg:gap-y-24 md:grid-cols-2 lg:grid-cols-3 py-12"
     >
         {
-            products.map((product) => (
-                <figure class="relative ">
-                    <a
-                        href={product.url}
-                        aria-hidden="true"
-                        class="absolute inset-0"
-                    />
-                    <Image
-                        width="800"
-                        height="800"
-                        alt={product.title}
-                        src={product.image}
-                        class="w-full rounded-3xl shadow aspect-12/9 object-cover object-center"
-                    />
-                    <div class="mt-2 flex justify-between px-6">
-                        <div>
-                            <p class="mt-1 text-sm font-medium  text-base-900">
-                                {product.subtitle}
+            products.length === 0 ? (
+                <p class="text-center text-gray-500">
+                    No hay productos disponibles
+                </p>
+            ) : (
+                products.map((product) => (
+                    <figure class="relative">
+                        <a
+                            href={product.url || "#_"}
+                            aria-hidden="true"
+                            class="absolute inset-0"
+                        />
+                        <img
+                            width="800"
+                            height="800"
+                            alt={product.title}
+                            src={product.image}
+                            class="w-full rounded-3xl shadow aspect-[12/9] object-cover object-center"
+                        />
+                        <div class="mt-2 flex justify-between px-6">
+                            <div>
+                                <p class="mt-1 text-sm font-medium text-base-900">
+                                    {product.subtitle}
+                                </p>
+                                <h3 class="text-xs text-base-500">
+                                    {product.title}
+                                </h3>
+                            </div>
+                            <p class="text-base text-orange-600">
+                                {product.price}
                             </p>
-                            <h3 class="text-xs text-base-500">
-                                {product.title}
-                            </h3>
                         </div>
-                        <p class="text-base text-orange-600">{product.price}</p>
-                    </div>
-                </figure>
-            ))
+                    </figure>
+                ))
+            )
         }
     </div>
 </section>
